@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>بازی حدس عدد - درگاه دوگانه کریپتو</title>
+    <title>بازی حدس عدد - درگاه کریپتو ایمن</title>
     <style>
         body {
             font-family: Tahoma, Arial, sans-serif;
@@ -63,7 +63,7 @@
             background-color: #5b6eae;
         }
         .wallet-connect-btn {
-            background-color: #f6851b; /* رنگ متاماسک */
+            background-color: #f6851b;
             color: white;
             font-size: 16px;
             font-weight: bold;
@@ -145,16 +145,20 @@
         let secretNumber;
         let attempts = 0;
 
-        // شبیه‌سازی اتصال کیف پول
-        function connectWallet() {
-            // بررسی ساده برای اینکه آیا کاربر افزونه متاماسک دارد یا خیر
+        // اصلاح اتصال کیف پول (بلاک کردن ورود در صورت عدم وجود افزونه)
+        async function connectWallet() {
             if (typeof window.ethereum !== 'undefined') {
-                alert("درخواست اتصال به کیف پول (شبیه‌سازی وب۳)... کیف پول شما متصل شد!");
-                unlockGame();
+                try {
+                    // درخواست واقعی اتصال به متاماسک
+                    const accounts = await window.ethereum.request({ method: 'eth_requestAccounts' });
+                    alert("کیف پول شما با موفقیت متصل شد! 🎉");
+                    unlockGame();
+                } catch (error) {
+                    alert("اتصال کیف پول توسط کاربر لغو شد.");
+                }
             } else {
-                alert("افزونه کیف پول (متاماسک) در مرورگر شما پیدا نشد. از روش دستی استفاده کنید یا افزونه را نصب کنید.");
-                // برای تست در محیطی که متاماسک نیست هم باز میکنیم:
-                unlockGame();
+                // اگر افزونه نصب نباشد، کاربر به هیچ وجه وارد بازی نمی‌شود
+                alert("❌ افزونه کیف پول (متاماسک) در مرورگر شما پیدا نشد. لطفاً متاماسک را نصب کنید یا از روش پرداخت دستی استفاده نمایید.");
             }
         }
 
@@ -179,7 +183,7 @@
                 return;
             }
 
-            alert("هش تراکنش شما به صورت دستی ثبت شد! (شبیه‌سازی). به بازی خوش آمدید.");
+            alert("هش تراکنش شما به صورت دستی ثبت شد! به بازی خوش آمدید.");
             unlockGame();
         }
 
