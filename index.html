@@ -1,0 +1,94 @@
+<!DOCTYPE html>
+<html lang="fa" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>بازی حدس عدد</title>
+    <style>
+        body {
+            font-family: Tahoma, Arial, sans-serif;
+            background-color: #f4f7f6;
+            text-align: center;
+            margin-top: 100px;
+        }
+        .container {
+            background-color: white;
+            padding: 30px;
+            border-radius: 10px;
+            display: inline-block;
+            box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+            max-width: 400px;
+        }
+        input {
+            padding: 10px;
+            font-size: 16px;
+            width: 60%;
+            border: 1px solid #ccc;
+            border-radius: 5px;
+        }
+        button {
+            padding: 10px 15px;
+            font-size: 16px;
+            background-color: #28a745;
+            color: white;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+        }
+        button:hover {
+            background-color: #218838;
+        }
+        .message {
+            margin-top: 20px;
+            font-weight: bold;
+            font-size: 18px;
+            color: #333;
+        }
+    </style>
+</head>
+<body>
+
+    <div class="container">
+        <h1>بازی حدس عدد</h1>
+        <p>من یک عدد بین ۱ تا ۱۰۰ انتخاب کرده‌ام. سعی کن آن را حدس بزنی.</p>
+        <input type="number" id="guessInput" placeholder="عدد خود را وارد کنید">
+        <button onclick="checkGuess()">بررسی</button>
+        <div class="message" id="message"></div>
+    </div>
+
+    <script>
+        // انتخاب عدد تصادفی توسط مرورگر
+        let secretNumber = Math.floor(Math.random() * 100) + 1;
+        let attempts = 0;
+
+        function checkGuess() {
+            let guessInput = document.getElementById('guessInput');
+            let messageDiv = document.getElementById('message');
+            let guess = parseInt(guessInput.value);
+
+            // بررسی معتبر بودن عدد
+            if (isNaN(guess) || guess < 1 || guess > 100) {
+                messageDiv.innerText = "لطفاً یک عدد معتبر بین ۱ تا ۱۰۰ وارد کنید.";
+                return;
+            }
+
+            attempts++;
+
+            if (guess < secretNumber) {
+                messageDiv.innerText = "بیشتر است! (عدد بزرگتر حدس بزن) ⬆️";
+            } else if (guess > secretNumber) {
+                messageDiv.innerText = "کمتر است! (عدد کوچکتر حدس بزن) ⬇️";
+            } else {
+                messageDiv.innerText = `تبریک می‌گم! 🎉 عدد درست همین بود. شما موفق شدید در ${attempts} تلاش آن را حدس بزنید.`;
+                // غیرفعال کردن دکمه و اینپوت بعد از برنده شدن
+                document.getElementById('guessInput').disabled = true;
+            }
+            
+            // خالی کردن باکس ورودی برای حدس بعدی
+            guessInput.value = '';
+            guessInput.focus();
+        }
+    </script>
+
+</body>
+</html>
