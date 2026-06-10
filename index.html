@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>بازی حدس عدد - درگاه کریپتو ایمن</title>
+    <title>بازی حدس عدد - درگاه کریپتو واقعی</title>
     <style>
         body {
             font-family: Tahoma, Arial, sans-serif;
@@ -113,19 +113,19 @@
 <body>
 
     <div class="container">
-        <h1>بازی حدس عدد (نسخه کریپتو 🪙)</h1>
+        <h1>بازی حدس عدد (نسخه کریپتو واقعی 🪙)</h1>
         
         <div id="paymentSection">
-            <p>برای دسترسی به این بازی جذاب، معادل ۲ دلار (USDT/ETH) پرداخت کنید:</p>
+            <p>برای دسترسی به این بازی جذاب، معادل ۲ دلار (BNB/ETH) پرداخت کنید:</p>
             
-            <button class="wallet-connect-btn" onclick="connectWallet()">🔗 اتصال کیف پول (MetaMask / Web3)</button>
+            <button class="wallet-connect-btn" onclick="payWithWallet()">🔗 اتصال والت و پرداخت ۲ دلاری 💎</button>
             
             <div class="divider"><span>یا روش دوم</span></div>
 
             <div>
                 <p style="font-size: 14px; font-weight: bold;">واریز دستی به آدرس زیر:</p>
                 <div class="wallet-box">0x1234567890abcdef1234567890abcdef12345678</div>
-                <p style="font-size: 12px; color: #666;">شبکه: ترون (TRC20) یا بایننس (BEP20)</p>
+                <p style="font-size: 12px; color: #666;">شبکه: بایننس (BEP20) یا اتریوم (ERC20)</p>
                 
                 <input type="text" class="tx-input" id="txHashInput" placeholder="Transaction Hash (TXID) را اینجا وارد کنید">
                 <br>
@@ -145,20 +145,44 @@
         let secretNumber;
         let attempts = 0;
 
-        // اصلاح اتصال کیف پول (بلاک کردن ورود در صورت عدم وجود افزونه)
-        async function connectWallet() {
-            if (typeof window.ethereum !== 'undefined') {
-                try {
-                    // درخواست واقعی اتصال به متاماسک
-                    const accounts = await window.ethereum.request({ method: 'eth_requestAccounts' });
-                    alert("کیف پول شما با موفقیت متصل شد! 🎉");
-                    unlockGame();
-                } catch (error) {
-                    alert("اتصال کیف پول توسط کاربر لغو شد.");
-                }
-            } else {
-                // اگر افزونه نصب نباشد، کاربر به هیچ وجه وارد بازی نمی‌شود
-                alert("❌ افزونه کیف پول (متاماسک) در مرورگر شما پیدا نشد. لطفاً متاماسک را نصب کنید یا از روش پرداخت دستی استفاده نمایید.");
+        // پرداخت واقعی از طریق متاماسک
+        async function payWithWallet() {
+            if (typeof window.ethereum === 'undefined') {
+                alert("❌ افزونه کیف پول (متاماسک) در مرورگر شما پیدا نشد. لطفاً متاماسک را نصب کنید.");
+                return;
+            }
+
+            try {
+                // درخواست اتصال به کیف پول
+                const accounts = await window.ethereum.request({ method: 'eth_requestAccounts' });
+                const userAccount = accounts[0];
+
+                // مقدار 2 دلار به Wei (برای شبکه های بر پایه اتریوم/اسمارت چین). 
+                // به طور مثال 0.005 عدد از ارز شبکه (حدودی برای معادل 2 دلار).
+                // شما می‌توانید این عدد را بسته به نیاز دقیق شبکه خود تغییر دهید.
+                const amountInWei = "0x12305bc6e48000"; 
+
+                // آدرس کیف پول شما برای دریافت وجه (حتماً آدرس خود را اینجا بگذارید)
+                const destinationAddress = "0x1234567890abcdef1234567890abcdef12345678";
+
+                // ارسال درخواست تراکنش به متاماسک
+                const txHash = await window.ethereum.request({
+                    method: 'eth_sendTransaction',
+                    params: [
+                        {
+                            from: userAccount,
+                            to: destinationAddress,
+                            value: amountInWei, 
+                        },
+                    ],
+                });
+
+                alert("🎉 تراکنش با موفقیت امضا شد! هش تراکنش شما: " + txHash);
+                unlockGame();
+
+            } catch (error) {
+                console.error(error);
+                alert("پرداخت انجام نشد یا توسط شما لغو گردید.");
             }
         }
 
