@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>بازی حدس عدد</title>
+    <title>بازی حدس عدد - نسخه پولی</title>
     <style>
         body {
             font-family: Tahoma, Arial, sans-serif;
@@ -38,28 +38,66 @@
         button:hover {
             background-color: #218838;
         }
+        .pay-btn {
+            background-color: #ffc107;
+            color: #333;
+            font-size: 18px;
+            font-weight: bold;
+            padding: 15px 25px;
+            border-radius: 8px;
+            border: none;
+            cursor: pointer;
+            width: 100%;
+            margin-top: 15px;
+        }
+        .pay-btn:hover {
+            background-color: #e0a800;
+        }
         .message {
             margin-top: 20px;
             font-weight: bold;
             font-size: 18px;
             color: #333;
         }
+        .game-area {
+            display: none; /* مخفی کردن بازی تا قبل از پرداخت */
+        }
     </style>
 </head>
 <body>
 
     <div class="container">
-        <h1>بازی حدس عدد</h1>
-        <p>من یک عدد بین ۱ تا ۱۰۰ انتخاب کرده‌ام. سعی کن آن را حدس بزنی.</p>
-        <input type="number" id="guessInput" placeholder="عدد خود را وارد کنید">
-        <button onclick="checkGuess()">بررسی</button>
-        <div class="message" id="message"></div>
+        <h1>بازی حدس عدد (نسخه ویژه)</h1>
+        
+        <div id="paymentSection">
+            <p>برای دسترسی به این بازی جذاب و سرگرم‌کننده، باید مبلغ ۱۰,۰۰۰ تومان پرداخت کنید.</p>
+            <button class="pay-btn" onclick="processPayment()">پرداخت و شروع بازی 💳</button>
+        </div>
+
+        <div class="game-area" id="gameArea">
+            <p>من یک عدد بین ۱ تا ۱۰۰ انتخاب کرده‌ام. سعی کن آن را حدس بزنی.</p>
+            <input type="number" id="guessInput" placeholder="عدد خود را وارد کنید">
+            <button onclick="checkGuess()">بررسی</button>
+            <div class="message" id="message"></div>
+        </div>
     </div>
 
     <script>
-        // انتخاب عدد تصادفی توسط مرورگر
-        let secretNumber = Math.floor(Math.random() * 100) + 1;
+        let secretNumber;
         let attempts = 0;
+
+        // شبیه‌سازی پرداخت
+        function processPayment() {
+            alert("پرداخت با موفقیت شبیه‌سازی شد! به بازی خوش آمدید.");
+            
+            // مخفی کردن صفحه پرداخت و نمایش محیط بازی
+            document.getElementById('paymentSection').style.display = 'none';
+            document.getElementById('gameArea').style.display = 'block';
+            
+            // انتخاب عدد تصادفی بعد از پرداخت
+            secretNumber = Math.floor(Math.random() * 100) + 1;
+            attempts = 0;
+        }
 
         function checkGuess() {
             let guessInput = document.getElementById('guessInput');
@@ -80,11 +118,9 @@
                 messageDiv.innerText = "کمتر است! (عدد کوچکتر حدس بزن) ⬇️";
             } else {
                 messageDiv.innerText = `تبریک می‌گم! 🎉 عدد درست همین بود. شما موفق شدید در ${attempts} تلاش آن را حدس بزنید.`;
-                // غیرفعال کردن دکمه و اینپوت بعد از برنده شدن
                 document.getElementById('guessInput').disabled = true;
             }
             
-            // خالی کردن باکس ورودی برای حدس بعدی
             guessInput.value = '';
             guessInput.focus();
         }
