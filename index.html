@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>بازی حدس عدد - نسخه کریپتو</title>
+    <title>بازی حدس عدد - نسخه کریپتو واقعی</title>
     <style>
         body {
             font-family: Tahoma, Arial, sans-serif;
@@ -25,6 +25,15 @@
             width: 60%;
             border: 1px solid #ccc;
             border-radius: 5px;
+        }
+        .tx-input {
+            padding: 10px;
+            font-size: 14px;
+            width: 80%;
+            border: 1px solid #007bff;
+            border-radius: 5px;
+            margin-bottom: 15px;
+            font-family: monospace;
         }
         button {
             padding: 10px 15px;
@@ -48,7 +57,7 @@
             border: none;
             cursor: pointer;
             width: 100%;
-            margin-top: 15px;
+            margin-top: 10px;
         }
         .pay-btn:hover {
             background-color: #5b6eae;
@@ -86,6 +95,9 @@
             <div class="wallet-box">0x1234567890abcdef1234567890abcdef12345678</div>
             
             <p style="font-size: 13px; color: #666;">شبکه انتقال: ترون (TRC20) یا بایننس (BEP20)</p>
+            
+            <input type="text" class="tx-input" id="txHashInput" placeholder="لطفاً Transaction Hash (TXID) را اینجا وارد کنید">
+            <br>
             <button class="pay-btn" onclick="verifyCryptoPayment()">واریز کردم، شروع بازی 🚀</button>
         </div>
 
@@ -102,8 +114,21 @@
         let attempts = 0;
 
         function verifyCryptoPayment() {
-            // در محیط فرانت‌اند، واریز را به صورت دستی تایید می‌کنیم
-            alert("تراکنش شما بررسی شد (شبیه‌سازی). خوش آمدید!");
+            let txHash = document.getElementById('txHashInput').value.trim();
+            
+            // بررسی اینکه کاربر کادر هش را خالی نگذاشته باشد
+            if (txHash === "") {
+                alert("لطفاً پس از انجام واریز، Transaction Hash (TXID) پرداخت خود را در کادر وارد کنید.");
+                return;
+            }
+
+            // بررسی ساده برای طول هش (معمولاً هش های اتریوم و ترون طولانی هستند)
+            if (txHash.length < 15) {
+                alert("هش تراکنش وارد شده معتبر به نظر نمی‌رسد. لطفاً هش کامل (TXID) را به درستی وارد کنید.");
+                return;
+            }
+
+            alert("هش تراکنش شما دریافت و ثبت شد! (شبیه‌سازی). به بازی خوش آمدید.");
             
             document.getElementById('paymentSection').style.display = 'none';
             document.getElementById('gameArea').style.display = 'block';
