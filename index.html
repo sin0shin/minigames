@@ -3,13 +3,13 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>بازی حدس عدد - نسخه کریپتو واقعی</title>
+    <title>بازی حدس عدد - درگاه دوگانه کریپتو</title>
     <style>
         body {
             font-family: Tahoma, Arial, sans-serif;
             background-color: #f4f7f6;
             text-align: center;
-            margin-top: 50px;
+            margin-top: 30px;
         }
         .container {
             background-color: white;
@@ -27,12 +27,12 @@
             border-radius: 5px;
         }
         .tx-input {
-            padding: 10px;
+            padding: 8px;
             font-size: 14px;
             width: 80%;
             border: 1px solid #007bff;
             border-radius: 5px;
-            margin-bottom: 15px;
+            margin-bottom: 10px;
             font-family: monospace;
         }
         button {
@@ -50,17 +50,32 @@
         .pay-btn {
             background-color: #7289da;
             color: white;
-            font-size: 18px;
+            font-size: 16px;
             font-weight: bold;
-            padding: 15px 25px;
+            padding: 12px 20px;
+            border-radius: 8px;
+            border: none;
+            cursor: pointer;
+            width: 85%;
+            margin-top: 5px;
+        }
+        .pay-btn:hover {
+            background-color: #5b6eae;
+        }
+        .wallet-connect-btn {
+            background-color: #f6851b; /* رنگ متاماسک */
+            color: white;
+            font-size: 16px;
+            font-weight: bold;
+            padding: 15px 20px;
             border-radius: 8px;
             border: none;
             cursor: pointer;
             width: 100%;
-            margin-top: 10px;
+            margin-bottom: 20px;
         }
-        .pay-btn:hover {
-            background-color: #5b6eae;
+        .wallet-connect-btn:hover {
+            background-color: #e27516;
         }
         .wallet-box {
             background-color: #f0f4f8;
@@ -70,7 +85,18 @@
             font-family: monospace;
             word-break: break-all;
             user-select: all;
-            margin: 15px 0;
+            margin: 10px 0;
+            font-size: 14px;
+        }
+        .divider {
+            margin: 20px 0;
+            border-top: 1px solid #ddd;
+            position: relative;
+        }
+        .divider span {
+            background: #fff;
+            padding: 0 10px;
+            color: #888;
             font-size: 14px;
         }
         .message {
@@ -90,15 +116,21 @@
         <h1>بازی حدس عدد (نسخه کریپتو 🪙)</h1>
         
         <div id="paymentSection">
-            <p>برای دسترسی به این بازی جذاب، باید معادل ۲ دلار (USDT/ETH) به آدرس کیف پول زیر واریز کنید:</p>
+            <p>برای دسترسی به این بازی جذاب، معادل ۲ دلار (USDT/ETH) پرداخت کنید:</p>
             
-            <div class="wallet-box">0x1234567890abcdef1234567890abcdef12345678</div>
+            <button class="wallet-connect-btn" onclick="connectWallet()">🔗 اتصال کیف پول (MetaMask / Web3)</button>
             
-            <p style="font-size: 13px; color: #666;">شبکه انتقال: ترون (TRC20) یا بایننس (BEP20)</p>
-            
-            <input type="text" class="tx-input" id="txHashInput" placeholder="لطفاً Transaction Hash (TXID) را اینجا وارد کنید">
-            <br>
-            <button class="pay-btn" onclick="verifyCryptoPayment()">واریز کردم، شروع بازی 🚀</button>
+            <div class="divider"><span>یا روش دوم</span></div>
+
+            <div>
+                <p style="font-size: 14px; font-weight: bold;">واریز دستی به آدرس زیر:</p>
+                <div class="wallet-box">0x1234567890abcdef1234567890abcdef12345678</div>
+                <p style="font-size: 12px; color: #666;">شبکه: ترون (TRC20) یا بایننس (BEP20)</p>
+                
+                <input type="text" class="tx-input" id="txHashInput" placeholder="Transaction Hash (TXID) را اینجا وارد کنید">
+                <br>
+                <button class="pay-btn" onclick="verifyManualPayment()">ثبت واریز دستی و شروع بازی 🚀</button>
+            </div>
         </div>
 
         <div class="game-area" id="gameArea">
@@ -113,28 +145,42 @@
         let secretNumber;
         let attempts = 0;
 
-        function verifyCryptoPayment() {
-            let txHash = document.getElementById('txHashInput').value.trim();
-            
-            // بررسی اینکه کاربر کادر هش را خالی نگذاشته باشد
-            if (txHash === "") {
-                alert("لطفاً پس از انجام واریز، Transaction Hash (TXID) پرداخت خود را در کادر وارد کنید.");
-                return;
+        // شبیه‌سازی اتصال کیف پول
+        function connectWallet() {
+            // بررسی ساده برای اینکه آیا کاربر افزونه متاماسک دارد یا خیر
+            if (typeof window.ethereum !== 'undefined') {
+                alert("درخواست اتصال به کیف پول (شبیه‌سازی وب۳)... کیف پول شما متصل شد!");
+                unlockGame();
+            } else {
+                alert("افزونه کیف پول (متاماسک) در مرورگر شما پیدا نشد. از روش دستی استفاده کنید یا افزونه را نصب کنید.");
+                // برای تست در محیطی که متاماسک نیست هم باز میکنیم:
+                unlockGame();
             }
+        }
 
-            // بررسی ساده برای طول هش (معمولاً هش های اتریوم و ترون طولانی هستند)
-            if (txHash.length < 15) {
-                alert("هش تراکنش وارد شده معتبر به نظر نمی‌رسد. لطفاً هش کامل (TXID) را به درستی وارد کنید.");
-                return;
-            }
-
-            alert("هش تراکنش شما دریافت و ثبت شد! (شبیه‌سازی). به بازی خوش آمدید.");
-            
+        function unlockGame() {
             document.getElementById('paymentSection').style.display = 'none';
             document.getElementById('gameArea').style.display = 'block';
             
             secretNumber = Math.floor(Math.random() * 100) + 1;
             attempts = 0;
+        }
+
+        function verifyManualPayment() {
+            let txHash = document.getElementById('txHashInput').value.trim();
+            
+            if (txHash === "") {
+                alert("لطفاً پس از واریز، Transaction Hash (TXID) را در کادر وارد کنید.");
+                return;
+            }
+
+            if (txHash.length < 15) {
+                alert("هش تراکنش وارد شده معتبر نیست. لطفاً هش کامل (TXID) را وارد کنید.");
+                return;
+            }
+
+            alert("هش تراکنش شما به صورت دستی ثبت شد! (شبیه‌سازی). به بازی خوش آمدید.");
+            unlockGame();
         }
 
         function checkGuess() {
